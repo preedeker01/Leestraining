@@ -1,0 +1,11 @@
+Leestraining PWA
+
+Bestanden:
+- index.html
+- manifest.webmanifest
+- service-worker.js
+- icon.svg
+
+Belangrijk:
+Een PWA werkt pas volledig wanneer deze map via HTTPS wordt aangeboden.
+Open daarna index.html in Samsung Internet of Chrome en kies 'Toevoegen aan startscherm' / 'App installeren'.

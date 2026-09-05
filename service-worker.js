@@ -1,5 +1,5 @@
-const CACHE_NAME='leestraining-v3-sixletters-update';
-const ASSETS=['./','./index.html','./manifest.webmanifest','./icon.svg'];
+const CACHE_NAME='leestraining-v4-sevenletters-audio';
+const ASSETS=['./','./index.html','./manifest.webmanifest','./icon.svg','./SpeechOn.wav','./SpeechOff.wav'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(ASSETS)));});
 self.addEventListener('message',e=>{if(e.data&&e.data.type==='SKIP_WAITING')self.skipWaiting();});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))));self.clients.claim();});

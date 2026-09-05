@@ -458,6 +458,16 @@ body {
 .update-banner span{flex:1;font-size:1rem;font-weight:700;color:#123487}
 .update-banner button{border:0;border-radius:12px;background:#123487;color:#fff;font-size:1rem;font-weight:700;padding:10px 14px;cursor:pointer}
 
+
+.home-choice.red{background:#d94a4a}
+.tiles.seven-tiles{gap:3px}
+.seven-tiles span{width:clamp(19px,5vw,32px);height:clamp(31px,7vw,43px);font-size:clamp(1.05rem,4vw,1.75rem)}
+#sevenScreen .item{font-size:clamp(.88rem,3.35vh,1.55rem) !important;padding:2px 1px !important;line-height:1 !important;white-space:nowrap !important}
+#sevenScreen #s7_hint{padding-right:64px !important;padding-left:4px !important;text-align:left !important}
+@media (orientation:landscape){
+  #sevenScreen .item{font-size:clamp(.82rem,4.25vh,1.42rem) !important}
+}
+
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#123487">
@@ -465,6 +475,20 @@ body {
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 </head>
 <body>
+
+<script>
+const correctAnswerAudio = new Audio('SpeechOn.wav');
+const wrongAnswerAudio = new Audio('SpeechOff.wav');
+correctAnswerAudio.preload='auto';
+wrongAnswerAudio.preload='auto';
+window.playCorrectSound=function(){
+  try{ correctAnswerAudio.pause(); correctAnswerAudio.currentTime=0; correctAnswerAudio.play().catch(()=>{}); }catch(e){}
+};
+window.playWrongSound=function(){
+  try{ wrongAnswerAudio.pause(); wrongAnswerAudio.currentTime=0; wrongAnswerAudio.play().catch(()=>{}); }catch(e){}
+};
+</script>
+
 
 
 <section id="homeScreen" class="screen active">
@@ -496,6 +520,11 @@ body {
     <button class="home-choice teal" onclick="showScreen('sixScreen')">
       <span class="tiles six-tiles"><span>k</span><span>o</span><span>f</span><span>f</span><span>i</span><span>e</span></span>
       <span class="home-label">Mots de 6 lettres</span>
+    </button>
+
+    <button class="home-choice red" onclick="showScreen('sevenScreen')">
+      <span class="tiles seven-tiles"><span>o</span><span>c</span><span>h</span><span>t</span><span>e</span><span>n</span><span>d</span></span>
+      <span class="home-label">Mots de 7 lettres</span>
     </button>
 
     <div class="love-note" aria-label="Bisous Paul">
@@ -652,10 +681,10 @@ function render(){
     b.onclick=async()=>{
       if(searchMode){
         // Fout: blijf op dezelfde letter wachten.
-        if(letter!==searchTarget) return;
+        if(letter!==searchTarget){ window.playWrongSound(); return; }
 
         // Goed: ping en daarna automatisch een nieuwe letter.
-        ping();
+        window.playCorrectSound();
         b.classList.add("correct");
         document.getElementById("hint").textContent="Correct !";
 
@@ -913,10 +942,10 @@ function render(){
 
       if(searchMode){
         // Wrong answer: keep waiting for the same target, no new word.
-        if(x!==searchTarget) return;
+        if(x!==searchTarget){ window.playWrongSound(); return; }
 
         // Correct answer: ping, briefly mark correct, then automatically continue.
-        ping();
+        window.playCorrectSound();
         b.classList.add("correct");
         document.getElementById("hint").textContent="Correct !";
 
@@ -1178,10 +1207,10 @@ function render(){
 
       if(searchMode){
         // Wrong answer: keep waiting for the same target, no new word.
-        if(x!==searchTarget) return;
+        if(x!==searchTarget){ window.playWrongSound(); return; }
 
         // Correct answer: ping, briefly mark correct, then automatically continue.
-        ping();
+        window.playCorrectSound();
         b.classList.add("correct");
         document.getElementById("hint").textContent="Correct !";
 
@@ -1425,10 +1454,10 @@ function render(){
 
       if(searchMode){
         // Wrong answer: keep waiting for the same target, no new word.
-        if(x!==searchTarget) return;
+        if(x!==searchTarget){ window.playWrongSound(); return; }
 
         // Correct answer: ping, briefly mark correct, then automatically continue.
-        ping();
+        window.playCorrectSound();
         b.classList.add("correct");
         document.getElementById("hint").textContent="Correct !";
 
@@ -1579,7 +1608,7 @@ function speakOnce(text){return new Promise(resolve=>{const u=new SpeechSynthesi
 function speakFrench(text){return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang='fr-FR';if(frenchVoice)u.voice=frenchVoice;u.rate=.58;u.pitch=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u);});}
 async function speakThree(w){speechSynthesis.cancel();await sleep(80);for(let i=0;i<3;i++){if(stopped)break;await speakOnce(w);if(i<2&&!stopped)await sleep(260);}}
 function ping(){const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const c=new A(),o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.setValueAtTime(.16,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.27);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.27);}
-function render(){const g=document.getElementById('s6_grid');g.innerHTML='';current.forEach(w=>{const b=document.createElement('button');b.className='item';b.textContent=displayCase[w]||w;b.addEventListener('click',async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();document.getElementById('s6_hint').textContent=w+' = '+translations[w];await speakFrench(translations[w]);return;}if(searchMode&&searchTarget){if(w===searchTarget){ping();b.classList.add('correct');await sleep(280);b.classList.remove('correct');lastSearchTarget=searchTarget;searchTarget=null;await offerNext();}return;}clearMarks();b.classList.add('active');stopped=false;await speakThree(w);b.classList.remove('active');});g.appendChild(b);});}
+function render(){const g=document.getElementById('s6_grid');g.innerHTML='';current.forEach(w=>{const b=document.createElement('button');b.className='item';b.textContent=displayCase[w]||w;b.addEventListener('click',async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();document.getElementById('s6_hint').textContent=w+' = '+translations[w];await speakFrench(translations[w]);return;}if(searchMode&&searchTarget){if(w===searchTarget){window.playCorrectSound();b.classList.add('correct');await sleep(280);b.classList.remove('correct');lastSearchTarget=searchTarget;searchTarget=null;await offerNext();}else{window.playWrongSound();}return;}clearMarks();b.classList.add('active');stopped=false;await speakThree(w);b.classList.remove('active');});g.appendChild(b);});}
 function makeMix(){current=shuffle(allWords).slice(0,12);displayCase={};current.forEach(w=>displayCase[w]=Math.random()<.5?w.charAt(0).toUpperCase()+w.slice(1):w);clearMarks();render();}
 async function offerNext(){if(!searchMode||stopped)return;let opts=current.filter(w=>w!==lastSearchTarget);if(!opts.length)opts=current;searchTarget=opts[Math.floor(Math.random()*opts.length)];document.getElementById('s6_hint').textContent='Écoute et trouve le bon mot.';await sleep(80);if(searchMode&&searchTarget&&!stopped)await speakOnce(searchTarget);}
 document.getElementById('s6_play').addEventListener('click',async()=>{stopSearch();stopped=true;speechSynthesis.cancel();await sleep(80);stopped=false;const bs=[...document.querySelectorAll('#s6_grid .item')];document.getElementById('s6_hint').textContent='Exemple';for(let i=0;i<current.length;i++){if(stopped)break;clearMarks();bs[i].classList.add('active');await speakThree(current[i]);bs[i].classList.remove('active');if(stopped)break;await sleep(320);}clearMarks();document.getElementById('s6_hint').textContent='Appuie sur un mot pour l’entendre 3×.';});
@@ -1587,6 +1616,50 @@ document.getElementById('s6_stop').addEventListener('click',()=>{stopped=true;sp
 document.getElementById('s6_mix').addEventListener('click',()=>{stopped=true;speechSynthesis.cancel();stopSearch();makeMix();document.getElementById('s6_hint').textContent='Appuie sur un mot pour l’entendre 3×.';});
 document.getElementById('s6_search').addEventListener('click',async()=>{speechSynthesis.cancel();clearMarks();if(searchMode&&searchTarget){stopped=false;document.getElementById('s6_hint').textContent='Écoute encore et trouve le bon mot.';await sleep(80);if(searchMode&&searchTarget&&!stopped)await speakOnce(searchTarget);return;}stopped=true;stopSearch();await sleep(80);stopped=false;searchMode=true;lastSearchTarget=null;await offerNext();});
 document.getElementById('s6_translate').addEventListener('click',()=>{speechSynthesis.cancel();stopped=true;stopSearch();clearMarks();translateMode=!translateMode;document.getElementById('s6_translate').classList.toggle('on',translateMode);document.getElementById('s6_hint').textContent=translateMode?'Traduction activée : touchez un mot.':"Touchez un mot pour l’entendre 3×.";stopped=false;});
+makeMix();
+})();
+</script>
+</section>
+
+
+<section id="sevenScreen" class="screen">
+  <button class="global-home" onclick="showScreen('homeScreen')" aria-label="Accueil">⌂</button>
+  <div class="app">
+    <h1>Mots de sept lettres</h1>
+    <p id="s7_hint" class="hint">Appuie sur un mot pour l’entendre 3×.</p>
+    <div id="s7_grid" class="grid"></div>
+    <div class="controls">
+      <button id="s7_play">▶<br>Exemple</button>
+      <button id="s7_stop">■<br>Arrêter</button>
+      <button id="s7_mix">↻<br>Mélanger</button>
+      <button id="s7_search">🔎<br>Rechercher</button>
+    </div>
+    <button id="s7_translate" class="translate-btn">🌐<br>Traduire</button>
+  </div>
+<script>
+(function(){
+const translations={"aardbei":"fraise","aardige":"gentil","afgeven":"remettre","afhalen":"aller chercher","aflopen":"se terminer","afmaken":"terminer","afnemen":"diminuer","afstaan":"céder","afstand":"distance","alsmaar":"sans cesse","bedankt":"merci","bedoeld":"voulu","begrijp":"comprends","bekende":"connu","beloven":"promettre","beneden":"en bas","bericht":"message","bestaan":"exister","besteld":"commandé","betalen":"payer","bewegen":"bouger","bewaren":"conserver","bewoner":"habitant","blijven":"rester","bloemen":"fleurs","brengen":"apporter","brommer":"cyclomoteur","broeken":"pantalons","broodje":"sandwich","buurman":"voisin","contact":"contact","daarvan":"de cela","daarmee":"avec cela","dagboek":"journal","dinsdag":"mardi","drinken":"boire","drukker":"plus occupé","duurder":"plus cher","familie":"famille","fietsen":"faire du vélo","fietser":"cycliste","flessen":"bouteilles","gebeurt":"arrive","gebruik":"usage","gedacht":"pensé","gedeeld":"partagé","gehaald":"cherché","gehoord":"entendu","gekeken":"regardé","gelezen":"lu","gelopen":"marché","gemaakt":"fait","gemerkt":"remarqué","genomen":"pris","geopend":"ouvert","gepraat":"parlé","gereden":"conduit","gestopt":"arrêté","gewerkt":"travaillé","geweest":"été","gezonde":"sain","groente":"légumes","hondjes":"petits chiens","januari":"janvier","jongens":"garçons","kaarten":"cartes","kantoor":"bureau","kapotte":"cassé","kleding":"vêtements","kleiner":"plus petit","kloppen":"frapper","koffers":"valises","korting":"réduction","kranten":"journaux","krijgen":"recevoir","laatste":"dernier","lampjes":"petites lampes","leraren":"enseignants","luister":"écoute","maandag":"lundi","maanden":"mois","meestal":"généralement","meisjes":"filles","minuten":"minutes","nachten":"nuits","niemand":"personne","ochtend":"matin","oktober":"octobre","ophalen":"aller chercher","opmaken":"finir","opstaan":"se lever","overdag":"pendant la journée","parkeer":"garer","plezier":"plaisir","politie":"police","ruimtes":"espaces","scholen":"écoles","seconde":"seconde","sleutel":"clé","snelweg":"autoroute","sommige":"certains","spullen":"affaires","straten":"rues","stukken":"morceaux","treinen":"trains","trouwen":"se marier","tuinman":"jardinier","uitgaan":"sortir","vandaag":"aujourd’hui","verhaal":"histoire","verkeer":"circulation","verkoop":"vente","vertrek":"départ","vervoer":"transport","vliegen":"voler","vroeger":"autrefois","waarmee":"avec quoi","waarvan":"dont","wachten":"attendre","wanneer":"quand","weekend":"week-end","winkels":"magasins","woorden":"mots","aanname":"hypothèse","afkomen":"venir","afleren":"désapprendre","allebei":"tous les deux","bedenkt":"pense","bedient":"sert","bekijkt":"regarde","beslist":"certainement","betaald":"payé","bewijst":"prouve","bezorgd":"inquiet","dankzij":"grâce à","dichter":"plus proche","draaien":"tourner","eindigt":"finit","geleerd":"appris","gemeten":"mesuré","genoemd":"nommé","gevaren":"navigué","geweten":"su","grappen":"blagues","groepen":"groupes","opnieuw":"à nouveau","rekenen":"calculer","aanbied":"offre","aanvoer":"approvisionnement","afbraak":"démolition","afkomst":"origine","afsluit":"ferme","bediend":"servi","behoeft":"a besoin","bekeken":"regardé","beladen":"chargé","belandt":"atterrit","beleefd":"poli","beleven":"vivre","beloofd":"promis","benoemd":"nommé","bereikt":"atteint","beschik":"dispose","bestond":"existait","betaalt":"paie","bezocht":"visité","bewoond":"habité","bewuste":"conscient","blikken":"regarder","brieven":"lettres","brillen":"lunettes","daarbij":"avec cela","daaruit":"de là","dokters":"médecins","draaide":"tournait","drukken":"appuyer","eerdere":"antérieur","eetbaar":"comestible","eetlust":"appétit","eindjes":"bouts","fabriek":"usine","fietste":"faisait du vélo","folders":"dépliants","gebaren":"gestes","geboren":"né","gegeten":"mangé","geheten":"appelé","geloven":"croire","gemalen":"moulu","gemengd":"mélangé","gesprek":"conversation","gevulde":"rempli","gewenst":"souhaité","gezorgd":"pris soin","glijden":"glisser","groeien":"grandir","grotere":"plus grand","helften":"moitiés","herkent":"reconnaît","honderd":"cent","inhalen":"dépasser","keertje":"petite fois","kenmerk":"caractéristique","klinken":"sonner","koppels":"couples","kringen":"cercles","kruiden":"épices","leveren":"livrer","lichter":"plus léger","meedoen":"participer","meegaan":"accompagner","mevrouw":"madame","nergens":"nulle part","normaal":"normal","omkeren":"faire demi-tour","ontbijt":"petit-déjeuner","plekken":"endroits","prijzen":"prix","proeven":"goûter","redenen":"raisons","regelen":"organiser","sluiten":"fermer","spreken":"parler","stappen":"marcher","starten":"démarrer","stoppen":"arrêter","tafelen":"manger à table","toegang":"accès","trekken":"tirer","wandelt":"se promène","zachter":"plus doux","aankoop":"achat","aanloop":"élan","aanvang":"début","afwegen":"peser","behalve":"sauf","aardgas":"gaz naturel","bankpas":"carte bancaire","bochten":"virages","brander":"brûleur","bureaus":"bureaux","camping":"camping","dorpjes":"petits villages","douchen":"se doucher","eetbord":"assiette","handvat":"poignée","kaarsen":"bougies","kappers":"coiffeurs","kassier":"caissier","knippen":"couper","koffies":"cafés","meubels":"meubles","motoren":"moteurs","passend":"adapté","pincode":"code PIN","plassen":"uriner","postvak":"boîte aux lettres","schakel":"interrupteur","scheren":"se raser","spiegel":"miroir","stoffen":"tissus","storing":"panne","trappen":"escaliers","vuilnis":"ordures","wasgoed":"linge","zending":"envoi","afgrond":"précipice","beesten":"animaux","blouses":"blouses","centjes":"petite monnaie","dakgoot":"gouttière","dweilen":"passer la serpillière","garages":"garages","gordels":"ceintures","handtas":"sac à main","keukens":"cuisines","kindjes":"petits enfants","kussens":"coussins","laptops":"ordinateurs portables","leuning":"rampe","markten":"marchés","medisch":"médical","melkpak":"brique de lait","pleinen":"places","portiek":"entrée d’immeuble","reclame":"publicité","schalen":"plats","slagers":"bouchers","stekker":"fiche","stoelen":"chaises","tandjes":"petites dents","toetjes":"desserts","verzorg":"soigne","vorkjes":"petites fourchettes","winkelt":"fait des achats","zolders":"greniers","buurtje":"petit quartier","seizoen":"saison","anderen":"autres","aardbol":"globe terrestre"};
+const allWords=Object.keys(translations);
+let current=[],stopped=false,searchMode=false,searchTarget=null,lastSearchTarget=null,displayCase={},translateMode=false;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const screen=document.getElementById('sevenScreen');
+function clearMarks(){screen.querySelectorAll('.item').forEach(b=>{b.classList.remove('active');b.classList.remove('correct');});}
+function stopSearch(){searchMode=false;searchTarget=null;}
+let dutchVoice=null,frenchVoice=null;
+function chooseVoices(){const vs=speechSynthesis.getVoices();dutchVoice=vs.find(v=>(v.lang||'').toLowerCase()==='nl-nl')||vs.find(v=>(v.lang||'').toLowerCase().startsWith('nl'))||vs.find(v=>/dutch|nederlands/i.test(v.name||''))||null;frenchVoice=vs.find(v=>(v.lang||'').toLowerCase()==='fr-fr')||vs.find(v=>(v.lang||'').toLowerCase().startsWith('fr'))||vs.find(v=>/french|français/i.test(v.name||''))||null;}
+chooseVoices(); speechSynthesis.addEventListener('voiceschanged',chooseVoices);
+function speakOnce(text){return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang='nl-NL';if(dutchVoice)u.voice=dutchVoice;u.rate=.58;u.pitch=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u);});}
+function speakFrench(text){return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang='fr-FR';if(frenchVoice)u.voice=frenchVoice;u.rate=.58;u.pitch=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u);});}
+async function speakThree(w){speechSynthesis.cancel();await sleep(80);for(let i=0;i<3;i++){if(stopped)break;await speakOnce(w);if(i<2&&!stopped)await sleep(260);}}
+function render(){const g=document.getElementById('s7_grid');g.innerHTML='';current.forEach(w=>{const b=document.createElement('button');b.className='item';b.textContent=displayCase[w]||w;b.addEventListener('click',async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();document.getElementById('s7_hint').textContent=w+' = '+translations[w];await speakFrench(translations[w]);return;}if(searchMode&&searchTarget){if(w===searchTarget){window.playCorrectSound();b.classList.add('correct');await sleep(280);b.classList.remove('correct');lastSearchTarget=searchTarget;searchTarget=null;await offerNext();}else{window.playWrongSound();}return;}clearMarks();b.classList.add('active');stopped=false;await speakThree(w);b.classList.remove('active');});g.appendChild(b);});}
+function makeMix(){current=shuffle(allWords).slice(0,12);displayCase={};current.forEach(w=>displayCase[w]=Math.random()<.5?w.charAt(0).toUpperCase()+w.slice(1):w);clearMarks();render();}
+async function offerNext(){if(!searchMode||stopped)return;let opts=current.filter(w=>w!==lastSearchTarget);if(!opts.length)opts=current;searchTarget=opts[Math.floor(Math.random()*opts.length)];document.getElementById('s7_hint').textContent='Écoute et trouve le bon mot.';await sleep(80);if(searchMode&&searchTarget&&!stopped)await speakOnce(searchTarget);}
+document.getElementById('s7_play').addEventListener('click',async()=>{stopSearch();stopped=true;speechSynthesis.cancel();await sleep(80);stopped=false;const bs=[...document.querySelectorAll('#s7_grid .item')];document.getElementById('s7_hint').textContent='Exemple';for(let i=0;i<current.length;i++){if(stopped)break;clearMarks();bs[i].classList.add('active');await speakThree(current[i]);bs[i].classList.remove('active');if(stopped)break;await sleep(320);}clearMarks();document.getElementById('s7_hint').textContent='Appuie sur un mot pour l’entendre 3×.';});
+document.getElementById('s7_stop').addEventListener('click',()=>{stopped=true;speechSynthesis.cancel();stopSearch();clearMarks();document.getElementById('s7_hint').textContent='Arrêté.';});
+document.getElementById('s7_mix').addEventListener('click',()=>{stopped=true;speechSynthesis.cancel();stopSearch();makeMix();document.getElementById('s7_hint').textContent='Appuie sur un mot pour l’entendre 3×.';});
+document.getElementById('s7_search').addEventListener('click',async()=>{speechSynthesis.cancel();clearMarks();if(searchMode&&searchTarget){stopped=false;document.getElementById('s7_hint').textContent='Écoute encore et trouve le bon mot.';await sleep(80);if(searchMode&&searchTarget&&!stopped)await speakOnce(searchTarget);return;}stopped=true;stopSearch();await sleep(80);stopped=false;searchMode=true;lastSearchTarget=null;await offerNext();});
+document.getElementById('s7_translate').addEventListener('click',()=>{speechSynthesis.cancel();stopped=true;stopSearch();clearMarks();translateMode=!translateMode;document.getElementById('s7_translate').classList.toggle('on',translateMode);document.getElementById('s7_hint').textContent=translateMode?'Traduction activée : touchez un mot.':"Touchez un mot pour l’entendre 3×.";stopped=false;});
 makeMix();
 })();
 </script>
@@ -1726,10 +1799,10 @@ function render(){
     b.onclick=async()=>{
       if(searchMode){
         // Fout: blijf op dezelfde letter wachten.
-        if(letter!==searchTarget) return;
+        if(letter!==searchTarget){ window.playWrongSound(); return; }
 
         // Goed: ping en daarna automatisch een nieuwe letter.
-        ping();
+        window.playCorrectSound();
         b.classList.add("correct");
         document.getElementById("l_hint").textContent="Correct !";
 
@@ -1970,10 +2043,10 @@ function render(){
 
       if(searchMode){
         // Wrong answer: keep waiting for the same target, no new word.
-        if(x!==searchTarget) return;
+        if(x!==searchTarget){ window.playWrongSound(); return; }
 
         // Correct answer: ping, briefly mark correct, then automatically continue.
-        ping();
+        window.playCorrectSound();
         b.classList.add("correct");
         document.getElementById("t_hint").textContent="Correct !";
 
@@ -2218,10 +2291,10 @@ function render(){
 
       if(searchMode){
         // Wrong answer: keep waiting for the same target, no new word.
-        if(x!==searchTarget) return;
+        if(x!==searchTarget){ window.playWrongSound(); return; }
 
         // Correct answer: ping, briefly mark correct, then automatically continue.
-        ping();
+        window.playCorrectSound();
         b.classList.add("correct");
         document.getElementById("f4_hint").textContent="Correct !";
 
@@ -2448,10 +2521,10 @@ function render(){
 
       if(searchMode){
         // Wrong answer: keep waiting for the same target, no new word.
-        if(x!==searchTarget) return;
+        if(x!==searchTarget){ window.playWrongSound(); return; }
 
         // Correct answer: ping, briefly mark correct, then automatically continue.
-        ping();
+        window.playCorrectSound();
         b.classList.add("correct");
         document.getElementById("f5_hint").textContent="Correct !";
 

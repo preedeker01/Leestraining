@@ -589,6 +589,37 @@ body {
   .item .word-translation{font-size:50%}
 }
 
+
+/* Franse vertaling direct onder alle Nederlandse zinnen */
+.sentence-item.sentence-with-translation{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  overflow:hidden;
+}
+.sentence-item .sentence-main{
+  display:block;
+  font-size:1em;
+  line-height:1.08;
+}
+.sentence-item .sentence-translation{
+  display:block;
+  width:100%;
+  font-size:50%;
+  line-height:1.05;
+  font-weight:600;
+  color:#596274;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  text-align:center;
+}
+@media (orientation:landscape){
+  .sentence-item.sentence-with-translation{gap:2px}
+  .sentence-item .sentence-translation{font-size:50%}
+}
+
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#123487">
@@ -1831,7 +1862,12 @@ function stopSearch(){searchMode=false;searchTarget=null}
 function render(){
  const g=document.getElementById('sentenceGrid');g.innerHTML='';
  current.forEach(x=>{
-  const b=document.createElement('button');b.className='sentence-item';b.textContent=x.nl;
+  const b=document.createElement('button');b.className='sentence-item';
+  const main=document.createElement('span');main.className='sentence-main';main.textContent=x.nl;b.appendChild(main);
+  if(translateMode){
+   b.classList.add('sentence-with-translation');
+   const tr=document.createElement('span');tr.className='sentence-translation';tr.textContent=x.fr;b.appendChild(tr);
+  }
   b.onclick=async()=>{
    if(translateMode){speechSynthesis.cancel();clearMarks();document.getElementById('sentenceHint').textContent=x.nl+' = '+x.fr;await speakFrench(x.fr);return}
    if(searchMode&&searchTarget){
@@ -1859,7 +1895,7 @@ window.openSentenceScreen=function(){
  showScreen('sentenceScreen')
 };
 document.getElementById('sentencePlay').onclick=async()=>{
- stopSearch();translateMode=false;document.getElementById('sentenceTranslate').classList.remove('on');
+ stopSearch();translateMode=false;document.getElementById('sentenceTranslate').classList.remove('on');render();
  stopped=true;speechSynthesis.cancel();await sleep(70);stopped=false;clearMarks();
  document.getElementById('sentenceHint').textContent='Exemple';
  const bs=[...document.querySelectorAll('#sentenceGrid .sentence-item')];
@@ -1869,14 +1905,15 @@ document.getElementById('sentencePlay').onclick=async()=>{
 document.getElementById('sentenceStop').onclick=()=>{stopped=true;speechSynthesis.cancel();stopSearch();clearMarks();document.getElementById('sentenceHint').textContent='Arrêté.'};
 document.getElementById('sentenceMix').onclick=()=>{stopped=true;speechSynthesis.cancel();stopSearch();makeMix();document.getElementById('sentenceHint').textContent=translateMode?'Traduction activée : touchez une phrase.':'Appuie sur une phrase pour l’entendre 3×.'};
 document.getElementById('sentenceSearch').onclick=async()=>{
- speechSynthesis.cancel();clearMarks();translateMode=false;document.getElementById('sentenceTranslate').classList.remove('on');
+ speechSynthesis.cancel();clearMarks();translateMode=false;document.getElementById('sentenceTranslate').classList.remove('on');render();
  if(searchMode&&searchTarget){stopped=false;document.getElementById('sentenceHint').textContent='Écoute encore et trouve la même phrase.';await sleep(70);await speakDutch(searchTarget);return}
  stopped=true;stopSearch();await sleep(60);stopped=false;searchMode=true;lastTarget=null;await offerNext()
 };
 document.getElementById('sentenceTranslate').onclick=()=>{
  speechSynthesis.cancel();stopped=true;stopSearch();clearMarks();translateMode=!translateMode;
  document.getElementById('sentenceTranslate').classList.toggle('on',translateMode);
- document.getElementById('sentenceHint').textContent=translateMode?'Traduction activée : touchez une phrase.':'Appuie sur une phrase pour l’entendre 3×.';
+ render();
+ document.getElementById('sentenceHint').textContent=translateMode?'Traduction activée : la traduction française est affichée sous chaque phrase.':'Appuie sur une phrase pour l’entendre 3×.';
  stopped=false
 };
 makeMix();

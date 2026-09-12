@@ -557,6 +557,38 @@ body {
   .sentence-translate{min-height:27px;padding:2px;font-size:clamp(.58rem,2.7vh,.8rem)}
 }
 
+
+/* Vertaling direct onder het Nederlandse woord op alle woordknoppen */
+.item.word-with-translation{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  line-height:1.0;
+  overflow:hidden;
+}
+.item .word-main{
+  display:block;
+  font-size:1em;
+  line-height:1.0;
+}
+.item .word-translation{
+  display:block;
+  width:100%;
+  font-size:50%;
+  line-height:1.05;
+  font-weight:600;
+  color:#596274;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  text-align:center;
+}
+@media (orientation:landscape){
+  .item.word-with-translation{gap:2px}
+  .item .word-translation{font-size:50%}
+}
+
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#123487">
@@ -1024,7 +1056,7 @@ function render(){
   current.forEach(x=>{
     const b=document.createElement("button");
     b.className="item";
-    b.textContent=displayCase[x] || x;
+    const main=document.createElement("span");main.className="word-main";main.textContent=displayCase[x]||x;b.appendChild(main);if(translateMode){b.classList.add("word-with-translation");const tr=document.createElement("span");tr.className="word-translation";tr.textContent=translations[x]||"—";b.appendChild(tr);}
 
     b.addEventListener("click", async()=>{
 
@@ -1298,7 +1330,7 @@ function render(){
   current.forEach(x=>{
     const b=document.createElement("button");
     b.className="item";
-    b.textContent=displayCase[x] || x;
+    const main=document.createElement("span");main.className="word-main";main.textContent=displayCase[x]||x;b.appendChild(main);if(translateMode){b.classList.add("word-with-translation");const tr=document.createElement("span");tr.className="word-translation";tr.textContent=translations[x]||"—";b.appendChild(tr);}
 
     b.addEventListener("click", async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();const fr=translations[x]||"—";document.getElementById("hint").textContent=x+" = "+fr;await speakFrench(fr);return;}
 
@@ -1545,7 +1577,7 @@ function render(){
   current.forEach(x=>{
     const b=document.createElement("button");
     b.className="item";
-    b.textContent=displayCase[x] || x;
+    const main=document.createElement("span");main.className="word-main";main.textContent=displayCase[x]||x;b.appendChild(main);if(translateMode){b.classList.add("word-with-translation");const tr=document.createElement("span");tr.className="word-translation";tr.textContent=translations[x]||"—";b.appendChild(tr);}
 
     b.addEventListener("click", async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();const fr=translations[x]||"—";document.getElementById("hint").textContent=x+" = "+fr;await speakFrench(fr);return;}
 
@@ -1705,14 +1737,14 @@ function speakOnce(text){return new Promise(resolve=>{const u=new SpeechSynthesi
 function speakFrench(text){return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang='fr-FR';if(frenchVoice)u.voice=frenchVoice;u.rate=.58;u.pitch=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u);});}
 async function speakThree(w){speechSynthesis.cancel();await sleep(80);for(let i=0;i<3;i++){if(stopped)break;await speakOnce(w);if(i<2&&!stopped)await sleep(260);}}
 function ping(){const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const c=new A(),o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.setValueAtTime(.16,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.27);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.27);}
-function render(){const g=document.getElementById('s6_grid');g.innerHTML='';current.forEach(w=>{const b=document.createElement('button');b.className='item';b.textContent=displayCase[w]||w;b.addEventListener('click',async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();document.getElementById('s6_hint').textContent=w+' = '+translations[w];await speakFrench(translations[w]);return;}if(searchMode&&searchTarget){if(w===searchTarget){window.playCorrectSound();b.classList.add('correct');await sleep(280);b.classList.remove('correct');lastSearchTarget=searchTarget;searchTarget=null;await offerNext();}else{window.playWrongSound();}return;}clearMarks();b.classList.add('active');stopped=false;await speakThree(w);b.classList.remove('active');});g.appendChild(b);});}
+function render(){const g=document.getElementById('s6_grid');g.innerHTML='';current.forEach(w=>{const b=document.createElement('button');b.className='item';const main=document.createElement('span');main.className='word-main';main.textContent=displayCase[w]||w;b.appendChild(main);if(translateMode){b.classList.add('word-with-translation');const tr=document.createElement('span');tr.className='word-translation';tr.textContent=translations[w]||'—';b.appendChild(tr);}b.addEventListener('click',async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();document.getElementById('s6_hint').textContent=w+' = '+translations[w];await speakFrench(translations[w]);return;}if(searchMode&&searchTarget){if(w===searchTarget){window.playCorrectSound();b.classList.add('correct');await sleep(280);b.classList.remove('correct');lastSearchTarget=searchTarget;searchTarget=null;await offerNext();}else{window.playWrongSound();}return;}clearMarks();b.classList.add('active');stopped=false;await speakThree(w);b.classList.remove('active');});g.appendChild(b);});}
 function makeMix(){current=shuffle(allWords).slice(0,12);displayCase={};current.forEach(w=>displayCase[w]=Math.random()<.5?w.charAt(0).toUpperCase()+w.slice(1):w);clearMarks();render();}
 async function offerNext(){if(!searchMode||stopped)return;let opts=current.filter(w=>w!==lastSearchTarget);if(!opts.length)opts=current;searchTarget=opts[Math.floor(Math.random()*opts.length)];document.getElementById('s6_hint').textContent='Écoute et trouve le bon mot.';await sleep(80);if(searchMode&&searchTarget&&!stopped)await speakOnce(searchTarget);}
 document.getElementById('s6_play').addEventListener('click',async()=>{stopSearch();stopped=true;speechSynthesis.cancel();await sleep(80);stopped=false;const bs=[...document.querySelectorAll('#s6_grid .item')];document.getElementById('s6_hint').textContent='Exemple';for(let i=0;i<current.length;i++){if(stopped)break;clearMarks();bs[i].classList.add('active');await speakThree(current[i]);bs[i].classList.remove('active');if(stopped)break;await sleep(320);}clearMarks();document.getElementById('s6_hint').textContent='Appuie sur un mot pour l’entendre 3×.';});
 document.getElementById('s6_stop').addEventListener('click',()=>{stopped=true;speechSynthesis.cancel();stopSearch();clearMarks();document.getElementById('s6_hint').textContent='Arrêté.';});
 document.getElementById('s6_mix').addEventListener('click',()=>{stopped=true;speechSynthesis.cancel();stopSearch();makeMix();document.getElementById('s6_hint').textContent='Appuie sur un mot pour l’entendre 3×.';});
 document.getElementById('s6_search').addEventListener('click',async()=>{speechSynthesis.cancel();clearMarks();if(searchMode&&searchTarget){stopped=false;document.getElementById('s6_hint').textContent='Écoute encore et trouve le bon mot.';await sleep(80);if(searchMode&&searchTarget&&!stopped)await speakOnce(searchTarget);return;}stopped=true;stopSearch();await sleep(80);stopped=false;searchMode=true;lastSearchTarget=null;await offerNext();});
-document.getElementById('s6_translate').addEventListener('click',()=>{speechSynthesis.cancel();stopped=true;stopSearch();clearMarks();translateMode=!translateMode;document.getElementById('s6_translate').classList.toggle('on',translateMode);document.getElementById('s6_hint').textContent=translateMode?'Traduction activée : touchez un mot.':"Touchez un mot pour l’entendre 3×.";stopped=false;});
+document.getElementById('s6_translate').addEventListener('click',()=>{speechSynthesis.cancel();stopped=true;stopSearch();clearMarks();translateMode=!translateMode;document.getElementById('s6_translate').classList.toggle('on',translateMode);document.getElementById('s6_hint').textContent=translateMode?'Traduction activée : touchez un mot.':"Touchez un mot pour l’entendre 3×.";render();stopped=false;});
 makeMix();
 })();
 </script>
@@ -1749,14 +1781,14 @@ chooseVoices(); speechSynthesis.addEventListener('voiceschanged',chooseVoices);
 function speakOnce(text){return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang='nl-NL';if(dutchVoice)u.voice=dutchVoice;u.rate=.58;u.pitch=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u);});}
 function speakFrench(text){return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang='fr-FR';if(frenchVoice)u.voice=frenchVoice;u.rate=.58;u.pitch=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u);});}
 async function speakThree(w){speechSynthesis.cancel();await sleep(80);for(let i=0;i<3;i++){if(stopped)break;await speakOnce(w);if(i<2&&!stopped)await sleep(260);}}
-function render(){const g=document.getElementById('s7_grid');g.innerHTML='';current.forEach(w=>{const b=document.createElement('button');b.className='item';b.textContent=displayCase[w]||w;b.addEventListener('click',async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();document.getElementById('s7_hint').textContent=w+' = '+translations[w];await speakFrench(translations[w]);return;}if(searchMode&&searchTarget){if(w===searchTarget){window.playCorrectSound();b.classList.add('correct');await sleep(280);b.classList.remove('correct');lastSearchTarget=searchTarget;searchTarget=null;await offerNext();}else{window.playWrongSound();}return;}clearMarks();b.classList.add('active');stopped=false;await speakThree(w);b.classList.remove('active');});g.appendChild(b);});}
+function render(){const g=document.getElementById('s7_grid');g.innerHTML='';current.forEach(w=>{const b=document.createElement('button');b.className='item';const main=document.createElement('span');main.className='word-main';main.textContent=displayCase[w]||w;b.appendChild(main);if(translateMode){b.classList.add('word-with-translation');const tr=document.createElement('span');tr.className='word-translation';tr.textContent=translations[w]||'—';b.appendChild(tr);}b.addEventListener('click',async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();document.getElementById('s7_hint').textContent=w+' = '+translations[w];await speakFrench(translations[w]);return;}if(searchMode&&searchTarget){if(w===searchTarget){window.playCorrectSound();b.classList.add('correct');await sleep(280);b.classList.remove('correct');lastSearchTarget=searchTarget;searchTarget=null;await offerNext();}else{window.playWrongSound();}return;}clearMarks();b.classList.add('active');stopped=false;await speakThree(w);b.classList.remove('active');});g.appendChild(b);});}
 function makeMix(){current=shuffle(allWords).slice(0,12);displayCase={};current.forEach(w=>displayCase[w]=Math.random()<.5?w.charAt(0).toUpperCase()+w.slice(1):w);clearMarks();render();}
 async function offerNext(){if(!searchMode||stopped)return;let opts=current.filter(w=>w!==lastSearchTarget);if(!opts.length)opts=current;searchTarget=opts[Math.floor(Math.random()*opts.length)];document.getElementById('s7_hint').textContent='Écoute et trouve le bon mot.';await sleep(80);if(searchMode&&searchTarget&&!stopped)await speakOnce(searchTarget);}
 document.getElementById('s7_play').addEventListener('click',async()=>{stopSearch();stopped=true;speechSynthesis.cancel();await sleep(80);stopped=false;const bs=[...document.querySelectorAll('#s7_grid .item')];document.getElementById('s7_hint').textContent='Exemple';for(let i=0;i<current.length;i++){if(stopped)break;clearMarks();bs[i].classList.add('active');await speakThree(current[i]);bs[i].classList.remove('active');if(stopped)break;await sleep(320);}clearMarks();document.getElementById('s7_hint').textContent='Appuie sur un mot pour l’entendre 3×.';});
 document.getElementById('s7_stop').addEventListener('click',()=>{stopped=true;speechSynthesis.cancel();stopSearch();clearMarks();document.getElementById('s7_hint').textContent='Arrêté.';});
 document.getElementById('s7_mix').addEventListener('click',()=>{stopped=true;speechSynthesis.cancel();stopSearch();makeMix();document.getElementById('s7_hint').textContent='Appuie sur un mot pour l’entendre 3×.';});
 document.getElementById('s7_search').addEventListener('click',async()=>{speechSynthesis.cancel();clearMarks();if(searchMode&&searchTarget){stopped=false;document.getElementById('s7_hint').textContent='Écoute encore et trouve le bon mot.';await sleep(80);if(searchMode&&searchTarget&&!stopped)await speakOnce(searchTarget);return;}stopped=true;stopSearch();await sleep(80);stopped=false;searchMode=true;lastSearchTarget=null;await offerNext();});
-document.getElementById('s7_translate').addEventListener('click',()=>{speechSynthesis.cancel();stopped=true;stopSearch();clearMarks();translateMode=!translateMode;document.getElementById('s7_translate').classList.toggle('on',translateMode);document.getElementById('s7_hint').textContent=translateMode?'Traduction activée : touchez un mot.':"Touchez un mot pour l’entendre 3×.";stopped=false;});
+document.getElementById('s7_translate').addEventListener('click',()=>{speechSynthesis.cancel();stopped=true;stopSearch();clearMarks();translateMode=!translateMode;document.getElementById('s7_translate').classList.toggle('on',translateMode);document.getElementById('s7_hint').textContent=translateMode?'Traduction activée : touchez un mot.':"Touchez un mot pour l’entendre 3×.";render();stopped=false;});
 makeMix();
 })();
 </script>
@@ -2215,7 +2247,7 @@ function render(){
   current.forEach(x=>{
     const b=document.createElement("button");
     b.className="item";
-    b.textContent=displayCase[x] || x;
+    const main=document.createElement("span");main.className="word-main";main.textContent=displayCase[x]||x;b.appendChild(main);if(translateMode){b.classList.add("word-with-translation");const tr=document.createElement("span");tr.className="word-translation";tr.textContent=translations[x]||"—";b.appendChild(tr);}
 
     b.addEventListener("click", async()=>{
 
@@ -2363,7 +2395,7 @@ document.getElementById("t_translate").addEventListener("click", ()=>{
   document.getElementById("t_hint").textContent=translateMode
     ? "Traduction activée : touchez un mot."
     : "Touchez un mot pour l'entendre 3×.";
-  stopped=false;
+  render();stopped=false;
 });
 
 makeMix();
@@ -2472,7 +2504,7 @@ function render(){
   current.forEach(x=>{
     const b=document.createElement("button");
     b.className="item";
-    b.textContent=displayCase[x] || x;
+    const main=document.createElement("span");main.className="word-main";main.textContent=displayCase[x]||x;b.appendChild(main);if(translateMode){b.classList.add("word-with-translation");const tr=document.createElement("span");tr.className="word-translation";tr.textContent=translations[x]||"—";b.appendChild(tr);}
 
     b.addEventListener("click", async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();const fr=translations[x]||"—";document.getElementById("f4_hint").textContent=x+" = "+fr;await speakFrench(fr);return;}
 
@@ -2595,7 +2627,7 @@ document.getElementById("f4_search").addEventListener("click", async()=>{
   await offerNextSearchWord();
 });
 
-document.getElementById("f4_translate").addEventListener("click",()=>{speechSynthesis.cancel();stopped=true;stopSearch();clearMarks();translateMode=!translateMode;document.getElementById("f4_translate").classList.toggle("on",translateMode);document.getElementById("f4_hint").textContent=translateMode?"Traduction activée : touchez un mot.":"Touchez un mot pour l'entendre 3×.";stopped=false;});
+document.getElementById("f4_translate").addEventListener("click",()=>{speechSynthesis.cancel();stopped=true;stopSearch();clearMarks();translateMode=!translateMode;document.getElementById("f4_translate").classList.toggle("on",translateMode);document.getElementById("f4_hint").textContent=translateMode?"Traduction activée : touchez un mot.":"Touchez un mot pour l'entendre 3×.";render();stopped=false;});
 makeMix();
 })();
 (function(){
@@ -2702,7 +2734,7 @@ function render(){
   current.forEach(x=>{
     const b=document.createElement("button");
     b.className="item";
-    b.textContent=displayCase[x] || x;
+    const main=document.createElement("span");main.className="word-main";main.textContent=displayCase[x]||x;b.appendChild(main);if(translateMode){b.classList.add("word-with-translation");const tr=document.createElement("span");tr.className="word-translation";tr.textContent=translations[x]||"—";b.appendChild(tr);}
 
     b.addEventListener("click", async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();const fr=translations[x]||"—";document.getElementById("f5_hint").textContent=x+" = "+fr;await speakFrench(fr);return;}
 
@@ -2825,7 +2857,7 @@ document.getElementById("f5_search").addEventListener("click", async()=>{
   await offerNextSearchWord();
 });
 
-document.getElementById("f5_translate").addEventListener("click",()=>{speechSynthesis.cancel();stopped=true;stopSearch();clearMarks();translateMode=!translateMode;document.getElementById("f5_translate").classList.toggle("on",translateMode);document.getElementById("f5_hint").textContent=translateMode?"Traduction activée : touchez un mot.":"Touchez un mot pour l'entendre 3×.";stopped=false;});
+document.getElementById("f5_translate").addEventListener("click",()=>{speechSynthesis.cancel();stopped=true;stopSearch();clearMarks();translateMode=!translateMode;document.getElementById("f5_translate").classList.toggle("on",translateMode);document.getElementById("f5_hint").textContent=translateMode?"Traduction activée : touchez un mot.":"Touchez un mot pour l'entendre 3×.";render();stopped=false;});
 makeMix();
 })();
 </script>

@@ -620,6 +620,29 @@ body {
   .sentence-item .sentence-translation{font-size:50%}
 }
 
+
+/* Zinnen: groter lettertype.
+   Nederlandse zin = grootte van 6-letterwoorden.
+   Franse vertaling = grootte van 3-letterwoorden. */
+#sentenceScreen .sentence-item{
+  font-size:clamp(.94rem,3.35vh,1.58rem) !important;
+}
+#sentenceScreen .sentence-item .sentence-main{
+  font-size:1em !important;
+}
+#sentenceScreen .sentence-item .sentence-translation{
+  font-size:clamp(1.55rem,5.3vh,2.85rem) !important;
+  line-height:1.0 !important;
+}
+@media (orientation:landscape){
+  #sentenceScreen .sentence-item{
+    font-size:clamp(.8rem,4.55vh,1.38rem) !important;
+  }
+  #sentenceScreen .sentence-item .sentence-translation{
+    font-size:clamp(1.4rem,7vh,2.55rem) !important;
+  }
+}
+
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#123487">

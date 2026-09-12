@@ -1,11 +1,1 @@
-Leestraining PWA
-
-Bestanden:
-- index.html
-- manifest.webmanifest
-- service-worker.js
-- icon.svg
-
-Belangrijk:
-Een PWA werkt pas volledig wanneer deze map via HTTPS wordt aangeboden.
-Open daarna index.html in Samsung Internet of Chrome en kies 'Toevoegen aan startscherm' / 'App installeren'.
+Versie 4: letters en woorden van 3 t/m 7 letters. De 7-letteroefening bevat 300 woorden. In Rechercher klinkt SpeechOn.wav bij een goed antwoord en SpeechOff.wav bij een fout antwoord. Upload alle bestanden naar de root van de GitHub Pages repository.

@@ -797,11 +797,11 @@ function speakOnce(text){
   });
 }
 
-async function speakThree(letter){
+async function speakThree(letter){const run=(speakThree._run=(speakThree._run||0)+1);
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped) break;
+    if(stopped||run!==speakThree._run) break;
     await speakOnce(speakMap[letter] || letter);
     if(i<2 && !stopped) await sleep(260);
   }
@@ -1060,11 +1060,11 @@ function speakOnce(x){
   });
 }
 
-async function speakThree(x){
+async function speakThree(x){const run=(speakThree._run=(speakThree._run||0)+1);
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped) break;
+    if(stopped||run!==speakThree._run) break;
     await speakOnce(x);
     if(i<2&&!stopped) await sleep(260);
   }
@@ -1334,11 +1334,11 @@ function speakOnce(x){
   });
 }
 
-async function speakThree(x){
+async function speakThree(x){const run=(speakThree._run=(speakThree._run||0)+1);
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped) break;
+    if(stopped||run!==speakThree._run) break;
     await speakOnce(x);
     if(i<2&&!stopped) await sleep(260);
   }
@@ -1581,11 +1581,11 @@ function speakOnce(x){
   });
 }
 
-async function speakThree(x){
+async function speakThree(x){const run=(speakThree._run=(speakThree._run||0)+1);
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped) break;
+    if(stopped||run!==speakThree._run) break;
     await speakOnce(x);
     if(i<2&&!stopped) await sleep(260);
   }
@@ -1789,7 +1789,7 @@ function chooseVoices(){const vs=speechSynthesis.getVoices();dutchVoice=vs.find(
 chooseVoices(); speechSynthesis.addEventListener('voiceschanged',chooseVoices);
 function speakOnce(text){return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang='nl-NL';if(dutchVoice)u.voice=dutchVoice;u.rate=.58;u.pitch=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u);});}
 function speakFrench(text){return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang='fr-FR';if(frenchVoice)u.voice=frenchVoice;u.rate=.58;u.pitch=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u);});}
-async function speakThree(w){speechSynthesis.cancel();await sleep(80);for(let i=0;i<3;i++){if(stopped)break;await speakOnce(w);if(i<2&&!stopped)await sleep(260);}}
+async function speakThree(w){const run=(speakThree._run=(speakThree._run||0)+1);speechSynthesis.cancel();await sleep(80);for(let i=0;i<3;i++){if(stopped||run!==speakThree._run)break;await speakOnce(w);if(i<2&&!stopped&&run===speakThree._run)await sleep(260);}}
 function ping(){const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const c=new A(),o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.setValueAtTime(.16,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.27);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.27);}
 function render(){const g=document.getElementById('s6_grid');g.innerHTML='';current.forEach(w=>{const b=document.createElement('button');b.className='item';const main=document.createElement('span');main.className='word-main';main.textContent=displayCase[w]||w;b.appendChild(main);if(translateMode){b.classList.add('word-with-translation');const tr=document.createElement('span');tr.className='word-translation';tr.textContent=translations[w]||'—';b.appendChild(tr);}b.addEventListener('click',async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();document.getElementById('s6_hint').textContent=w+' = '+translations[w];await speakFrench(translations[w]);return;}if(searchMode&&searchTarget){if(w===searchTarget){window.playCorrectSound();b.classList.add('correct');await sleep(280);b.classList.remove('correct');lastSearchTarget=searchTarget;searchTarget=null;await offerNext();}else{window.playWrongSound();}return;}clearMarks();b.classList.add('active');stopped=false;await speakThree(w);b.classList.remove('active');});g.appendChild(b);});}
 function makeMix(){current=shuffle(allWords).slice(0,12);displayCase={};current.forEach(w=>displayCase[w]=Math.random()<.5?w.charAt(0).toUpperCase()+w.slice(1):w);clearMarks();render();}
@@ -1834,7 +1834,7 @@ function chooseVoices(){const vs=speechSynthesis.getVoices();dutchVoice=vs.find(
 chooseVoices(); speechSynthesis.addEventListener('voiceschanged',chooseVoices);
 function speakOnce(text){return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang='nl-NL';if(dutchVoice)u.voice=dutchVoice;u.rate=.58;u.pitch=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u);});}
 function speakFrench(text){return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang='fr-FR';if(frenchVoice)u.voice=frenchVoice;u.rate=.58;u.pitch=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u);});}
-async function speakThree(w){speechSynthesis.cancel();await sleep(80);for(let i=0;i<3;i++){if(stopped)break;await speakOnce(w);if(i<2&&!stopped)await sleep(260);}}
+async function speakThree(w){const run=(speakThree._run=(speakThree._run||0)+1);speechSynthesis.cancel();await sleep(80);for(let i=0;i<3;i++){if(stopped||run!==speakThree._run)break;await speakOnce(w);if(i<2&&!stopped&&run===speakThree._run)await sleep(260);}}
 function render(){const g=document.getElementById('s7_grid');g.innerHTML='';current.forEach(w=>{const b=document.createElement('button');b.className='item';const main=document.createElement('span');main.className='word-main';main.textContent=displayCase[w]||w;b.appendChild(main);if(translateMode){b.classList.add('word-with-translation');const tr=document.createElement('span');tr.className='word-translation';tr.textContent=translations[w]||'—';b.appendChild(tr);}b.addEventListener('click',async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();document.getElementById('s7_hint').textContent=w+' = '+translations[w];await speakFrench(translations[w]);return;}if(searchMode&&searchTarget){if(w===searchTarget){window.playCorrectSound();b.classList.add('correct');await sleep(280);b.classList.remove('correct');lastSearchTarget=searchTarget;searchTarget=null;await offerNext();}else{window.playWrongSound();}return;}clearMarks();b.classList.add('active');stopped=false;await speakThree(w);b.classList.remove('active');});g.appendChild(b);});}
 function makeMix(){current=shuffle(allWords).slice(0,12);displayCase={};current.forEach(w=>displayCase[w]=Math.random()<.5?w.charAt(0).toUpperCase()+w.slice(1):w);clearMarks();render();}
 async function offerNext(){if(!searchMode||stopped)return;let opts=current.filter(w=>w!==lastSearchTarget);if(!opts.length)opts=current;searchTarget=opts[Math.floor(Math.random()*opts.length)];document.getElementById('s7_hint').textContent='Écoute et trouve le bon mot.';await sleep(80);if(searchMode&&searchTarget&&!stopped)await speakOnce(searchTarget);}
@@ -1879,7 +1879,7 @@ function vfind(vs,re){return vs.find(v=>re.test(v.name||''))||null}
 chooseVoices();speechSynthesis.addEventListener('voiceschanged',chooseVoices);
 function speakDutch(t){return new Promise(r=>{const u=new SpeechSynthesisUtterance(t);u.lang='nl-NL';if(dutchVoice)u.voice=dutchVoice;u.rate=.58;u.pitch=1;u.onend=r;u.onerror=r;speechSynthesis.speak(u)})}
 function speakFrench(t){return new Promise(r=>{const u=new SpeechSynthesisUtterance(t);u.lang='fr-FR';if(frenchVoice)u.voice=frenchVoice;u.rate=.58;u.pitch=1;u.onend=r;u.onerror=r;speechSynthesis.speak(u)})}
-async function speakThree(t){speechSynthesis.cancel();await sleep(70);for(let i=0;i<3;i++){if(stopped)break;await speakDutch(t);if(i<2&&!stopped)await sleep(230)}}
+async function speakThree(t){const run=(speakThree._run=(speakThree._run||0)+1);speechSynthesis.cancel();await sleep(70);for(let i=0;i<3;i++){if(stopped||run!==speakThree._run)break;await speakDutch(t);if(i<2&&!stopped&&run===speakThree._run)await sleep(230)}}
 function clearMarks(){document.querySelectorAll('#sentenceGrid .sentence-item').forEach(b=>b.classList.remove('active','correct','wrong'))}
 function stopSearch(){searchMode=false;searchTarget=null}
 function render(){
@@ -2011,11 +2011,11 @@ function speakOnce(text){
   });
 }
 
-async function speakThree(letter){
+async function speakThree(letter){const run=(speakThree._run=(speakThree._run||0)+1);
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped) break;
+    if(stopped||run!==speakThree._run) break;
     await speakOnce(speakMap[letter] || letter);
     if(i<2 && !stopped) await sleep(260);
   }
@@ -2257,11 +2257,11 @@ function speakOnce(x){
   });
 }
 
-async function speakThree(x){
+async function speakThree(x){const run=(speakThree._run=(speakThree._run||0)+1);
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped) break;
+    if(stopped||run!==speakThree._run) break;
     await speakOnce(x);
     if(i<2&&!stopped) await sleep(260);
   }
@@ -2514,11 +2514,11 @@ function speakOnce(x){
   });
 }
 
-async function speakThree(x){
+async function speakThree(x){const run=(speakThree._run=(speakThree._run||0)+1);
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped) break;
+    if(stopped||run!==speakThree._run) break;
     await speakOnce(x);
     if(i<2&&!stopped) await sleep(260);
   }
@@ -2744,11 +2744,11 @@ function speakOnce(x){
   });
 }
 
-async function speakThree(x){
+async function speakThree(x){const run=(speakThree._run=(speakThree._run||0)+1);
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped) break;
+    if(stopped||run!==speakThree._run) break;
     await speakOnce(x);
     if(i<2&&!stopped) await sleep(260);
   }

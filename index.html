@@ -797,11 +797,11 @@ function speakOnce(text){
   });
 }
 
-async function speakThree(letter){const run=(speakThree._run=(speakThree._run||0)+1);
+async function speakThree(letter){
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped||run!==speakThree._run) break;
+    if(stopped) break;
     await speakOnce(speakMap[letter] || letter);
     if(i<2 && !stopped) await sleep(260);
   }
@@ -1060,11 +1060,11 @@ function speakOnce(x){
   });
 }
 
-async function speakThree(x){const run=(speakThree._run=(speakThree._run||0)+1);
+async function speakThree(x){
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped||run!==speakThree._run) break;
+    if(stopped) break;
     await speakOnce(x);
     if(i<2&&!stopped) await sleep(260);
   }
@@ -1334,11 +1334,11 @@ function speakOnce(x){
   });
 }
 
-async function speakThree(x){const run=(speakThree._run=(speakThree._run||0)+1);
+async function speakThree(x){
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped||run!==speakThree._run) break;
+    if(stopped) break;
     await speakOnce(x);
     if(i<2&&!stopped) await sleep(260);
   }
@@ -1581,11 +1581,11 @@ function speakOnce(x){
   });
 }
 
-async function speakThree(x){const run=(speakThree._run=(speakThree._run||0)+1);
+async function speakThree(x){
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped||run!==speakThree._run) break;
+    if(stopped) break;
     await speakOnce(x);
     if(i<2&&!stopped) await sleep(260);
   }
@@ -1789,7 +1789,7 @@ function chooseVoices(){const vs=speechSynthesis.getVoices();dutchVoice=vs.find(
 chooseVoices(); speechSynthesis.addEventListener('voiceschanged',chooseVoices);
 function speakOnce(text){return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang='nl-NL';if(dutchVoice)u.voice=dutchVoice;u.rate=.58;u.pitch=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u);});}
 function speakFrench(text){return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang='fr-FR';if(frenchVoice)u.voice=frenchVoice;u.rate=.58;u.pitch=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u);});}
-async function speakThree(w){const run=(speakThree._run=(speakThree._run||0)+1);speechSynthesis.cancel();await sleep(80);for(let i=0;i<3;i++){if(stopped||run!==speakThree._run)break;await speakOnce(w);if(i<2&&!stopped&&run===speakThree._run)await sleep(260);}}
+async function speakThree(w){speechSynthesis.cancel();await sleep(80);for(let i=0;i<3;i++){if(stopped)break;await speakOnce(w);if(i<2&&!stopped)await sleep(260);}}
 function ping(){const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const c=new A(),o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.setValueAtTime(.16,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.27);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.27);}
 function render(){const g=document.getElementById('s6_grid');g.innerHTML='';current.forEach(w=>{const b=document.createElement('button');b.className='item';const main=document.createElement('span');main.className='word-main';main.textContent=displayCase[w]||w;b.appendChild(main);if(translateMode){b.classList.add('word-with-translation');const tr=document.createElement('span');tr.className='word-translation';tr.textContent=translations[w]||'—';b.appendChild(tr);}b.addEventListener('click',async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();document.getElementById('s6_hint').textContent=w+' = '+translations[w];await speakFrench(translations[w]);return;}if(searchMode&&searchTarget){if(w===searchTarget){window.playCorrectSound();b.classList.add('correct');await sleep(280);b.classList.remove('correct');lastSearchTarget=searchTarget;searchTarget=null;await offerNext();}else{window.playWrongSound();}return;}clearMarks();b.classList.add('active');stopped=false;await speakThree(w);b.classList.remove('active');});g.appendChild(b);});}
 function makeMix(){current=shuffle(allWords).slice(0,12);displayCase={};current.forEach(w=>displayCase[w]=Math.random()<.5?w.charAt(0).toUpperCase()+w.slice(1):w);clearMarks();render();}
@@ -1834,7 +1834,7 @@ function chooseVoices(){const vs=speechSynthesis.getVoices();dutchVoice=vs.find(
 chooseVoices(); speechSynthesis.addEventListener('voiceschanged',chooseVoices);
 function speakOnce(text){return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang='nl-NL';if(dutchVoice)u.voice=dutchVoice;u.rate=.58;u.pitch=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u);});}
 function speakFrench(text){return new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang='fr-FR';if(frenchVoice)u.voice=frenchVoice;u.rate=.58;u.pitch=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u);});}
-async function speakThree(w){const run=(speakThree._run=(speakThree._run||0)+1);speechSynthesis.cancel();await sleep(80);for(let i=0;i<3;i++){if(stopped||run!==speakThree._run)break;await speakOnce(w);if(i<2&&!stopped&&run===speakThree._run)await sleep(260);}}
+async function speakThree(w){speechSynthesis.cancel();await sleep(80);for(let i=0;i<3;i++){if(stopped)break;await speakOnce(w);if(i<2&&!stopped)await sleep(260);}}
 function render(){const g=document.getElementById('s7_grid');g.innerHTML='';current.forEach(w=>{const b=document.createElement('button');b.className='item';const main=document.createElement('span');main.className='word-main';main.textContent=displayCase[w]||w;b.appendChild(main);if(translateMode){b.classList.add('word-with-translation');const tr=document.createElement('span');tr.className='word-translation';tr.textContent=translations[w]||'—';b.appendChild(tr);}b.addEventListener('click',async()=>{if(translateMode){speechSynthesis.cancel();clearMarks();document.getElementById('s7_hint').textContent=w+' = '+translations[w];await speakFrench(translations[w]);return;}if(searchMode&&searchTarget){if(w===searchTarget){window.playCorrectSound();b.classList.add('correct');await sleep(280);b.classList.remove('correct');lastSearchTarget=searchTarget;searchTarget=null;await offerNext();}else{window.playWrongSound();}return;}clearMarks();b.classList.add('active');stopped=false;await speakThree(w);b.classList.remove('active');});g.appendChild(b);});}
 function makeMix(){current=shuffle(allWords).slice(0,12);displayCase={};current.forEach(w=>displayCase[w]=Math.random()<.5?w.charAt(0).toUpperCase()+w.slice(1):w);clearMarks();render();}
 async function offerNext(){if(!searchMode||stopped)return;let opts=current.filter(w=>w!==lastSearchTarget);if(!opts.length)opts=current;searchTarget=opts[Math.floor(Math.random()*opts.length)];document.getElementById('s7_hint').textContent='Écoute et trouve le bon mot.';await sleep(80);if(searchMode&&searchTarget&&!stopped)await speakOnce(searchTarget);}
@@ -1849,11 +1849,29 @@ makeMix();
 </section>
 
 
+
+<style>
+#sentenceFocus.sentence-focus{
+  display:none;align-items:center;justify-content:center;text-align:center;
+  min-height:clamp(92px,18vh,170px);margin:6px 0 10px;padding:8px 12px;
+  border:3px solid #222;border-radius:18px;background:#fff;
+  font-size:clamp(3rem,11vw,6.4rem);font-weight:800;line-height:1.05;
+  overflow-wrap:anywhere;
+}
+#sentenceFocus.sentence-focus.show{display:flex}
+#sentenceFocus.sentence-focus.full{font-size:clamp(1.9rem,7vw,4rem)}
+@media (orientation:landscape){
+ #sentenceFocus.sentence-focus{min-height:clamp(70px,21vh,130px);font-size:clamp(2.5rem,9vh,5rem);margin:3px 0 6px}
+ #sentenceFocus.sentence-focus.full{font-size:clamp(1.55rem,6vh,3rem)}
+}
+</style>
+
 <section id="sentenceScreen" class="screen">
   <button class="global-home" onclick="showScreen('homeScreen')" title="Accueil">⌂</button>
   <div class="sentence-app">
     <h1>Phrases courtes en néerlandais</h1>
     <p id="sentenceHint" class="hint">Appuie sur une phrase pour l’entendre 3×.</p>
+    <div id="sentenceFocus" class="sentence-focus" aria-live="polite"></div>
     <div id="sentenceGrid" class="sentence-grid"></div>
     <div class="sentence-controls">
       <button id="sentencePlay">▶<br>Exemple</button>
@@ -1879,7 +1897,45 @@ function vfind(vs,re){return vs.find(v=>re.test(v.name||''))||null}
 chooseVoices();speechSynthesis.addEventListener('voiceschanged',chooseVoices);
 function speakDutch(t){return new Promise(r=>{const u=new SpeechSynthesisUtterance(t);u.lang='nl-NL';if(dutchVoice)u.voice=dutchVoice;u.rate=.58;u.pitch=1;u.onend=r;u.onerror=r;speechSynthesis.speak(u)})}
 function speakFrench(t){return new Promise(r=>{const u=new SpeechSynthesisUtterance(t);u.lang='fr-FR';if(frenchVoice)u.voice=frenchVoice;u.rate=.58;u.pitch=1;u.onend=r;u.onerror=r;speechSynthesis.speak(u)})}
-async function speakThree(t){const run=(speakThree._run=(speakThree._run||0)+1);speechSynthesis.cancel();await sleep(70);for(let i=0;i<3;i++){if(stopped||run!==speakThree._run)break;await speakDutch(t);if(i<2&&!stopped&&run===speakThree._run)await sleep(230)}}
+async function speakThree(t){speechSynthesis.cancel();await sleep(70);for(let i=0;i<3;i++){if(stopped)break;await speakDutch(t);if(i<2&&!stopped)await sleep(230)}}
+let guidedSentenceToken=0;
+function cleanSentenceWord(w){return w.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}'’\-]+$/gu,'')}
+function showSentenceFocus(text,full=false){
+ const el=document.getElementById('sentenceFocus');
+ el.textContent=text;el.classList.add('show');el.classList.toggle('full',full);
+}
+function hideSentenceFocus(){const el=document.getElementById('sentenceFocus');if(el){el.classList.remove('show','full');el.textContent=''}}
+function speakDutchRate(t,rate=.58){return new Promise(r=>{const u=new SpeechSynthesisUtterance(t);u.lang='nl-NL';if(dutchVoice)u.voice=dutchVoice;u.rate=rate;u.pitch=1;u.onend=r;u.onerror=r;speechSynthesis.speak(u)})}
+async function guidedSentence(sentence){
+ const token=++guidedSentenceToken;
+ stopped=false;speechSynthesis.cancel();await sleep(80);
+ const words=sentence.split(/\s+/).map(cleanSentenceWord).filter(Boolean);
+ // Eerste ronde: woord groot tonen, ongeveer 1 seconde wachten, dan uitspreken.
+ for(const w of words){
+  if(token!==guidedSentenceToken||stopped)return;
+  showSentenceFocus(w,false);
+  await sleep(950);
+  if(token!==guidedSentenceToken||stopped)return;
+  await speakDutchRate(w,.58);
+  if(token!==guidedSentenceToken||stopped)return;
+  await sleep(180);
+ }
+ // Tweede ronde: dezelfde woorden vlot achter elkaar tonen en uitspreken.
+ for(const w of words){
+  if(token!==guidedSentenceToken||stopped)return;
+  showSentenceFocus(w,false);
+  await sleep(120);
+  if(token!==guidedSentenceToken||stopped)return;
+  await speakDutchRate(w,.76);
+ }
+ if(token!==guidedSentenceToken||stopped)return;
+ // Tot slot de complete zin tonen en als één zin uitspreken.
+ showSentenceFocus(sentence,true);
+ await sleep(350);
+ if(token!==guidedSentenceToken||stopped)return;
+ await speakDutchRate(sentence,.68);
+}
+
 function clearMarks(){document.querySelectorAll('#sentenceGrid .sentence-item').forEach(b=>b.classList.remove('active','correct','wrong'))}
 function stopSearch(){searchMode=false;searchTarget=null}
 function render(){
@@ -1898,7 +1954,7 @@ function render(){
     else{window.playWrongSound();b.classList.add('wrong');setTimeout(()=>b.classList.remove('wrong'),400)}
     return
    }
-   clearMarks();b.classList.add('active');stopped=false;await speakThree(x.nl);b.classList.remove('active')
+   guidedSentenceToken++;speechSynthesis.cancel();clearMarks();b.classList.add('active');stopped=false;await guidedSentence(x.nl);if(!stopped)b.classList.remove('active')
   };
   g.appendChild(b)
  })
@@ -1912,7 +1968,7 @@ async function offerNext(){
  await sleep(70);if(searchMode&&searchTarget&&!stopped)await speakDutch(searchTarget)
 }
 window.openSentenceScreen=function(){
- speechSynthesis.cancel();stopped=true;stopSearch();translateMode=false;
+ guidedSentenceToken++;speechSynthesis.cancel();hideSentenceFocus();stopped=true;stopSearch();translateMode=false;
  document.getElementById('sentenceTranslate').classList.remove('on');
  makeMix();document.getElementById('sentenceHint').textContent='Appuie sur une phrase pour l’entendre 3×.';
  showScreen('sentenceScreen')
@@ -1925,15 +1981,15 @@ document.getElementById('sentencePlay').onclick=async()=>{
  for(let i=0;i<current.length;i++){if(stopped)break;bs[i].classList.add('active');await speakThree(current[i].nl);bs[i].classList.remove('active');if(!stopped)await sleep(180)}
  if(!stopped)document.getElementById('sentenceHint').textContent='Appuie sur une phrase pour l’entendre 3×.'
 };
-document.getElementById('sentenceStop').onclick=()=>{stopped=true;speechSynthesis.cancel();stopSearch();clearMarks();document.getElementById('sentenceHint').textContent='Arrêté.'};
-document.getElementById('sentenceMix').onclick=()=>{stopped=true;speechSynthesis.cancel();stopSearch();makeMix();document.getElementById('sentenceHint').textContent=translateMode?'Traduction activée : touchez une phrase.':'Appuie sur une phrase pour l’entendre 3×.'};
+document.getElementById('sentenceStop').onclick=()=>{guidedSentenceToken++;stopped=true;speechSynthesis.cancel();hideSentenceFocus();stopSearch();clearMarks();document.getElementById('sentenceHint').textContent='Arrêté.'};
+document.getElementById('sentenceMix').onclick=()=>{guidedSentenceToken++;stopped=true;speechSynthesis.cancel();hideSentenceFocus();stopSearch();makeMix();document.getElementById('sentenceHint').textContent=translateMode?'Traduction activée : touchez une phrase.':'Appuie sur une phrase pour l’entendre 3×.'};
 document.getElementById('sentenceSearch').onclick=async()=>{
  speechSynthesis.cancel();clearMarks();translateMode=false;document.getElementById('sentenceTranslate').classList.remove('on');render();
  if(searchMode&&searchTarget){stopped=false;document.getElementById('sentenceHint').textContent='Écoute encore et trouve la même phrase.';await sleep(70);await speakDutch(searchTarget);return}
  stopped=true;stopSearch();await sleep(60);stopped=false;searchMode=true;lastTarget=null;await offerNext()
 };
 document.getElementById('sentenceTranslate').onclick=()=>{
- speechSynthesis.cancel();stopped=true;stopSearch();clearMarks();translateMode=!translateMode;
+ guidedSentenceToken++;speechSynthesis.cancel();hideSentenceFocus();stopped=true;stopSearch();clearMarks();translateMode=!translateMode;
  document.getElementById('sentenceTranslate').classList.toggle('on',translateMode);
  render();
  document.getElementById('sentenceHint').textContent=translateMode?'Traduction activée : la traduction française est affichée sous chaque phrase.':'Appuie sur une phrase pour l’entendre 3×.';
@@ -2011,11 +2067,11 @@ function speakOnce(text){
   });
 }
 
-async function speakThree(letter){const run=(speakThree._run=(speakThree._run||0)+1);
+async function speakThree(letter){
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped||run!==speakThree._run) break;
+    if(stopped) break;
     await speakOnce(speakMap[letter] || letter);
     if(i<2 && !stopped) await sleep(260);
   }
@@ -2257,11 +2313,11 @@ function speakOnce(x){
   });
 }
 
-async function speakThree(x){const run=(speakThree._run=(speakThree._run||0)+1);
+async function speakThree(x){
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped||run!==speakThree._run) break;
+    if(stopped) break;
     await speakOnce(x);
     if(i<2&&!stopped) await sleep(260);
   }
@@ -2514,11 +2570,11 @@ function speakOnce(x){
   });
 }
 
-async function speakThree(x){const run=(speakThree._run=(speakThree._run||0)+1);
+async function speakThree(x){
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped||run!==speakThree._run) break;
+    if(stopped) break;
     await speakOnce(x);
     if(i<2&&!stopped) await sleep(260);
   }
@@ -2744,11 +2800,11 @@ function speakOnce(x){
   });
 }
 
-async function speakThree(x){const run=(speakThree._run=(speakThree._run||0)+1);
+async function speakThree(x){
   speechSynthesis.cancel();
   await sleep(80);
   for(let i=0;i<3;i++){
-    if(stopped||run!==speakThree._run) break;
+    if(stopped) break;
     await speakOnce(x);
     if(i<2&&!stopped) await sleep(260);
   }

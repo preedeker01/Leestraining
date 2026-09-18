@@ -1910,12 +1910,13 @@ async function guidedSentence(sentence){
  const token=++guidedSentenceToken;
  stopped=false;speechSynthesis.cancel();await sleep(80);
  const words=sentence.split(/\s+/).map(cleanSentenceWord).filter(Boolean);
- // Eerste ronde: woord groot tonen, 3 seconden bedenktijd, dan uitspreken.
- // De leerling krijgt zo eerst tijd om zelf de letters te herkennen en het woord te vormen.
+ // Eerste ronde: woord groot tonen en bedenktijd op basis van woordlengte.
+ // 1 seconde per letter: 2 letters = 2 sec, 5 letters = 5 sec, enz.
  for(const w of words){
   if(token!==guidedSentenceToken||stopped)return;
   showSentenceFocus(w,false);
-  await sleep(3000);
+  const aantalLetters=Array.from(w.normalize('NFC')).filter(ch=>/\p{L}/u.test(ch)).length;
+  await sleep(Math.max(1,aantalLetters)*1000);
   if(token!==guidedSentenceToken||stopped)return;
   await speakDutchRate(w,.58);
   if(token!==guidedSentenceToken||stopped)return;
